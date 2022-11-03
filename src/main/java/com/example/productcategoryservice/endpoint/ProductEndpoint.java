@@ -4,12 +4,13 @@ package com.example.productcategoryservice.endpoint;
 import com.example.productcategoryservice.dto.ProductRequestDto;
 import com.example.productcategoryservice.dto.ProductResponseDto;
 import com.example.productcategoryservice.mapper.ProductMapper;
+import com.example.productcategoryservice.model.Category;
 import com.example.productcategoryservice.model.Product;
+import com.example.productcategoryservice.service.CategoryService;
 import com.example.productcategoryservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 
 import java.util.List;
 import java.util.Optional;
@@ -17,12 +18,17 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 public class ProductEndpoint {
+
     private final ProductService productService;
     private final ProductMapper productMapper;
+    private final CategoryService categoryService;
 
     @GetMapping("/products")
-    public List<ProductResponseDto> getAllProducts() {
-        return productMapper.map(productService.findAll());
+    public ResponseEntity<List<ProductResponseDto>> getAllProducts() {
+        if (productService.findAll().size() == 0) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(productMapper.map(productService.findAll()));
     }
 
     @GetMapping("/products/{id}")
@@ -46,7 +52,11 @@ public class ProductEndpoint {
 
     @DeleteMapping("/products/{id}")
     ResponseEntity<Product> deleteProductById(@PathVariable("id") int id) {
-        productService.removeById(id);
+        Optional<Product> productById = productService.getProductById(id);
+        if (productById.isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+        productService.removeById(productById.get());
         return ResponseEntity.noContent().build();
     }
 
@@ -58,7 +68,11 @@ public class ProductEndpoint {
 
     @GetMapping("/products/{categoryId}")
     ResponseEntity<List<ProductResponseDto>> getByCategoryId(@PathVariable("id") int id) {
+        Optional<Category> byId = categoryService.getCategoryById(id);
+        if (byId.isEmpty()) {
+            return ResponseEntity.badRequest().build();        }
         return ResponseEntity.ok(productMapper.map(productService.findAllProductByCategoryId(id)));
     }
+
 
 }

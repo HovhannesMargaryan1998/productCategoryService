@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductRequestDto {
-    private String title;
-    private int count;
-    private double price;
-    private int categoryId;
+public class UserDto {
+    private int id;
+    private String name;
+    private String surname;
+    private String email;
 }

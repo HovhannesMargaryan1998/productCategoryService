@@ -16,7 +16,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 public class CategoryEndpoint {
-    private final CategoryService categoryService;
+    private final CategoryService  categoryService;
     private final CategoryMapper categoryMapper;
 
     @GetMapping("/categories")
